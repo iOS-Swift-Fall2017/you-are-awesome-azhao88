@@ -11,8 +11,10 @@ import AVFoundation
 
 class ViewController: UIViewController {
 
+    //MARK: - Properties
     @IBOutlet weak var messageLabel: UILabel!
     @IBOutlet weak var awesomeImage: UIImageView!
+    @IBOutlet weak var soundSwitch: UISwitch!
     var awesomePlayer = AVAudioPlayer()
     var index = -1
     var imageNumber = -1
@@ -23,6 +25,7 @@ class ViewController: UIViewController {
     //code below executes when the app's view first loads
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("Loaded")
     }
 
     func nonRepeatingNumber(lastNumber: Int, maxValue: Int) -> Int {
@@ -33,18 +36,30 @@ class ViewController: UIViewController {
         return newIndex
     }
     
-    func playSound(soundName: String) {
+    // MARK: - My Functions
+    func playSound(soundName: String, audioPlayer: inout AVAudioPlayer) {
         //can we load a sound
         if let sound = NSDataAsset(name: soundName) {
             //check if sound.data is a sound file
             do {
-                try awesomePlayer = AVAudioPlayer(data: sound.data)
-                awesomePlayer.play()
+                try audioPlayer = AVAudioPlayer(data: sound.data)
+                audioPlayer.play()
             } catch {
                 print("ERROR: data in \(soundName) couldn't be played as a sound")
             }
         } else {
             print("ERROR: file \(soundName) didn't load")
+        }
+    }
+
+    // MARK: - Actions
+    
+    @IBAction func soundSwitchPressed(_ sender: UISwitch) {
+        if !soundSwitch.isOn {
+            if soundNumber != -1 {
+            //stop playing
+            awesomePlayer.stop()
+            } 
         }
     }
     
@@ -68,13 +83,14 @@ class ViewController: UIViewController {
         imageNumber = nonRepeatingNumber(lastNumber: imageNumber, maxValue: numberOfImages)
         awesomeImage.image = UIImage(named: "image" + "\(imageNumber)")
         
-        //play a sound
-        soundNumber = nonRepeatingNumber(lastNumber: soundNumber, maxValue: numberOfSounds)
-        let soundName = "sound\(soundNumber)"
-        playSound(soundName: soundName)
+        if soundSwitch.isOn == true {
+            //play a sound
+            soundNumber = nonRepeatingNumber(lastNumber: soundNumber, maxValue: numberOfSounds)
+            let soundName = "sound\(soundNumber)"
+            playSound(soundName: soundName, audioPlayer: &awesomePlayer)
         }
-        
-        
+    
+    
         
     }
     
@@ -112,5 +128,5 @@ class ViewController: UIViewController {
     
     
     
-//}
+}
 
